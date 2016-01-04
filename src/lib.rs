@@ -4,47 +4,7 @@ use std::os::raw::c_void;
 use std::fmt;
 use std::ops::Deref;
 
-pub use backtrace as macro_backtrace;
-
-#[macro_export]
-macro_rules! trace {
-    () => {{
-    use $crate::macro_backtrace as backtrace;
-    let mut frames = Vec::new();
-    backtrace::trace(&mut |frame: &backtrace::Frame| {
-        let ip = frame.ip();
-        let mut symbol_handler = |symbol: &backtrace::Symbol| {
-            let name = symbol.name()
-                             .and_then(|name_bytes| ::std::str::from_utf8(name_bytes).ok())
-                             .and_then(|name_str| {
-                                 let mut demangled = String::new();
-                                 if let Ok(_) = backtrace::demangle(&mut demangled, name_str) {
-                                     Some(demangled)
-                                 } else {
-                                     None
-                                 }
-                             });
-            let addr = symbol.addr();
-            let filename = symbol.filename()
-                                 .and_then(|name| ::std::str::from_utf8(name).ok())
-                                 .map(|name: &str| name.to_owned());
-            let lineno = symbol.lineno();
-            frames.push($crate::FrameInfo {
-                ip: ip,
-                name: name,
-                addr: addr,
-                filename: filename,
-                lineno: lineno,
-            });
-        };
-        backtrace::resolve(ip, &mut symbol_handler);
-        true
-    });
-    $crate::StackInfo(frames)
-    }}
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct Trace<E> {
     pub err: E,
     pub stacktrace: StackInfo,
@@ -53,6 +13,15 @@ pub struct Trace<E> {
 impl<E: fmt::Display> fmt::Display for Trace<E> {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         write!(fmt, "{}\n{}", self.err, self.stacktrace)
+    }
+}
+
+impl<E: fmt::Debug> fmt::Debug for Trace<E> {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        try!(write!(fmt, "Trace {{\n"));
+        try!(write!(fmt, "err: {:?}\n", self.err));
+        try!(write!(fmt, "{}", self.stacktrace));
+        write!(fmt, "}}")
     }
 }
 
@@ -92,20 +61,46 @@ impl fmt::Display for FrameInfo {
 }
 
 impl<E> Trace<E> {
-    /// Wraps the provided argument in a trace of the stack.
-    /// This is probably only useful for returning errors up a long, unhandled
-    /// `Result` chain, to give a rough idea for the location of the source of
-    /// the error.
-    pub fn wrap(e: E) -> Self {
+    pub fn new(e: E) -> Self {
         Trace {
             err: e,
-            stacktrace: trace!(),
+            stacktrace: StackInfo::new(),
         }
     }
 }
 
 impl StackInfo {
     pub fn new() -> Self {
-        trace!()
+        let mut frames = Vec::new();
+        backtrace::trace(&mut |frame: &backtrace::Frame| {
+            let ip = frame.ip();
+            let mut symbol_handler = |symbol: &backtrace::Symbol| {
+                let name = symbol.name()
+                                 .and_then(|name_bytes| std::str::from_utf8(name_bytes).ok())
+                                 .and_then(|name_str| {
+                                     let mut demangled = String::new();
+                                     if let Ok(_) = backtrace::demangle(&mut demangled, name_str) {
+                                         Some(demangled)
+                                     } else {
+                                         None
+                                     }
+                                 });
+                let addr = symbol.addr();
+                let filename = symbol.filename()
+                                     .and_then(|name| std::str::from_utf8(name).ok())
+                                     .map(|name| name.to_owned());
+                let lineno = symbol.lineno();
+                frames.push(FrameInfo {
+                    ip: ip,
+                    name: name,
+                    addr: addr,
+                    filename: filename,
+                    lineno: lineno,
+                });
+            };
+            backtrace::resolve(ip, &mut symbol_handler);
+            true
+        });
+        StackInfo(frames)
     }
 }
