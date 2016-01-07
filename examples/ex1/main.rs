@@ -9,18 +9,30 @@ extern crate stacktrace;
 use stacktrace::Trace;
 use stacktrace::StackInfo;
 
-fn test1<A>(thing: A) -> Result<A, Trace<String>> {
+#[derive(Debug)]
+struct MyError(String);
+
+fn test1<A>(thing: A) -> Result<A, Trace<MyError>> {
     let a = try!(test2(thing));
     Ok(a)
 }
 
-fn test2<A>(thing: A) -> Result<A, Trace<String>> {
-    Err(Trace::new("hello, world!".to_owned()))
+fn test2<A>(thing: A) -> Result<A, Trace<MyError>> {
+    Err(Trace::new(MyError("hello, world!".to_owned())))
+}
+
+fn test3(i: i32) -> Result<String, Trace<MyError>> {
+    if i == 42 {
+        Ok("got thing!".to_owned())
+    } else {
+        test1("yolo".to_owned())
+    }
 }
 
 fn main() {
-    println!("Hello, world!");
-    println!("{}", StackInfo::new());
-    println!("{}", test1("yolo").err().unwrap());
-    test1("swagger").unwrap();
+    println!("A basic trace:\n{:?}\n", StackInfo::new());
+    println!("Going through 2 calls:\n{:?}\n", test1("yolo").err().unwrap());
+    println!("Going through 3 calls:\n{:?}\n", test3(41));
+    println!("Panicking:");
+    test1(3).unwrap();
 }

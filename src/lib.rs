@@ -10,35 +10,29 @@ pub struct Trace<E> {
     pub stacktrace: StackInfo,
 }
 
-impl<E: fmt::Display> fmt::Display for Trace<E> {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        write!(fmt, "{}\n{}", self.err, self.stacktrace)
-    }
-}
-
 impl<E: fmt::Debug> fmt::Debug for Trace<E> {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         try!(write!(fmt, "Trace {{\n"));
         try!(write!(fmt, "err: {:?}\n", self.err));
-        try!(write!(fmt, "{}", self.stacktrace));
+        try!(write!(fmt, "{:?}", self.stacktrace));
         write!(fmt, "}}")
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct StackInfo(pub Vec<FrameInfo>);
 
-impl fmt::Display for StackInfo {
+impl fmt::Debug for StackInfo {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         try!(write!(fmt, "stack backtrace:\n"));
         for (index, frame) in self.0.iter().enumerate() {
-            try!(write!(fmt, "{:4} - {}\n", index, frame));
+            try!(write!(fmt, "{:4} - {:?}\n", index, frame));
         }
         Ok(())
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct FrameInfo {
     /// Instruction pointer of the call frame
     pub ip: *mut c_void,
@@ -49,7 +43,7 @@ pub struct FrameInfo {
     pub lineno: Option<u32>,
 }
 
-impl fmt::Display for FrameInfo {
+impl fmt::Debug for FrameInfo {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         let name = self.name.as_ref().map(Deref::deref).unwrap_or("<unknown>");
         let filename = self.filename.as_ref().map(Deref::deref).unwrap_or("<unknown>");
