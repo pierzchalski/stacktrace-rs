@@ -7,6 +7,9 @@ readme = "README.md"
 license = "Apache-2.0/MIT"
 description = "A pretty printer for backtraces."
 repository = "https://github.com/pierzchalski/stacktrace-rs"
+keywords = [
+  "stack", "trace", "stacktrace", "backtrace",
+]
 
 [dependencies]
 backtrace = "0.1.8"
