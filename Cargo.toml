@@ -2,6 +2,8 @@
 name = "stacktrace"
 version = "0.1.0"
 authors = ["Edward Pierzchalski <e.a.pierzchalski@gmail.com>"]
+exclude = [".gitignore"]
+
 
 [dependencies]
 backtrace = "0.1.8"
