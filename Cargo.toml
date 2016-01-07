@@ -10,3 +10,7 @@ libc = "0.2.4"
 [[example]]
 name = "ex1"
 path = "examples/ex1/main.rs"
+# Include debugging symbols even in release build
+# so that the test still produces useful output
+[profile.release]
+debug = true

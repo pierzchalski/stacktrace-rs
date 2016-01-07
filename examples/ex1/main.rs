@@ -1,3 +1,8 @@
+//! This example has its 'release' build profile adjusted to
+//! include debug symbols, so it can show useful debugging
+//! information even in production (see 'Cargo.toml', under
+//! the configuration of example "ex1").
+
 #[macro_use]
 extern crate stacktrace;
 
