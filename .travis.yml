@@ -17,6 +17,15 @@ after_success: |
 
     [ "$TRAVIS_PULL_REQUEST" = false ]
 
+    # we only want to push stable versions of docs
+    if [ "$TRAVIS_RUST_VERSION" != "stable" ]
+    then
+      echo "Skipping doc step: rust version is $TRAVIS_RUST_VERSION"
+      exit 0
+    fi
+
+    echo "Proceeding with doc step: rust version is $TRAVIS_RUST_VERSION"
+
     eval key=\$encrypted_${SSH_KEY_TRAVIS_ID}_key
     eval iv=\$encrypted_${SSH_KEY_TRAVIS_ID}_iv
 
