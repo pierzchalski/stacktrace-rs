@@ -8,5 +8,6 @@ rust:
 matrix:
     allow_failures:
         - rust: nightly
+# if this is a horror story in the future, see https://github.com/kmcallister/travis-doc-upload/blob/master/README.md
 after_success: 
     curl https://raw.githubusercontent.com/kmcallister/travis-doc-upload/master/travis-doc-upload.sh | sh
