@@ -20,5 +20,12 @@ name = "ex1"
 path = "examples/ex1/main.rs"
 # Include debugging symbols even in release build
 # so that the test still produces useful output
+# unfortunately, this also keeps debug asserts
 [profile.release]
 debug = true
+
+[[example]]
+name = "ex2"
+path = "examples/ex2/main.rs"
+#[profile.release]
+# debug = true

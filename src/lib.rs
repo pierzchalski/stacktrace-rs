@@ -4,6 +4,19 @@ use std::os::raw::c_void;
 use std::fmt;
 use std::ops::Deref;
 
+#[macro_export]
+macro_rules! try_trace {
+    ($expr:expr) => {
+        match $expr {
+            ::std::result::Result::Ok(val) => val,
+            ::std::result::Result::Err(err) => {
+                let err = ::std::convert::From::from(err);
+                return ::std::result::Result::Err($crate::Trace::new(err));
+            }
+        }
+    }
+}
+
 #[derive(Clone, PartialEq, Eq)]
 pub struct Trace<E> {
     pub err: E,

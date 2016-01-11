@@ -3,7 +3,6 @@
 //! information even in production (see 'Cargo.toml', under
 //! the configuration of example "ex1").
 
-#[macro_use]
 extern crate stacktrace;
 
 use stacktrace::Trace;
