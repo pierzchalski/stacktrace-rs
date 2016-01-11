@@ -1,0 +1,12 @@
+language: rust
+script:
+    cargo build --verbose && cargo test --verbose && cargo doc
+rust:
+    - stable
+    - beta
+    - nightly
+matrix:
+    allow_failures:
+        - rust: nightly
+after_success: 
+    curl https://raw.githubusercontent.com/kmcallister/travis-doc-upload/master/travis-doc-upload.sh | sh
