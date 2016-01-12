@@ -1,21 +1,10 @@
+//!
+
 extern crate backtrace;
 
 use std::os::raw::c_void;
 use std::fmt;
 use std::ops::Deref;
-
-#[macro_export]
-macro_rules! try_trace {
-    ($expr:expr) => {
-        match $expr {
-            ::std::result::Result::Ok(val) => val,
-            ::std::result::Result::Err(err) => {
-                let err = ::std::convert::From::from(err);
-                return ::std::result::Result::Err($crate::Trace::new(err));
-            }
-        }
-    }
-}
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct Trace<E> {
@@ -72,6 +61,27 @@ impl<E> Trace<E> {
         Trace {
             err: e,
             stacktrace: StackInfo::new(),
+        }
+    }
+    pub fn result<A, F: From<E>>(res: Result<A, E>) -> Result<A, Trace<F>> {
+        match res {
+            Ok(a) => Ok(a),
+            Err(e) => Err(Trace {
+                err: From::from(e),
+                stacktrace: StackInfo::new(),
+            }),
+        }
+    }
+    pub fn map<A, F: From<E>>(res: Result<A, Trace<E>>) -> Result<A, Trace<F>> {
+        match res {
+            Ok(a) => Ok(a),
+            Err(Trace {
+                err: e,
+                stacktrace: st,
+            }) => Err(Trace {
+                err: From::from(e),
+                stacktrace: st,
+            }),
         }
     }
 }
