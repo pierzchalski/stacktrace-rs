@@ -72,7 +72,7 @@ impl<E> Trace<E> {
             }),
         }
     }
-    pub fn map<A, F: From<E>>(res: Result<A, Trace<E>>) -> Result<A, Trace<F>> {
+    pub fn trace<A, F: From<E>>(res: Result<A, Trace<E>>) -> Result<A, Trace<F>> {
         match res {
             Ok(a) => Ok(a),
             Err(Trace {

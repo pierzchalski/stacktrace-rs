@@ -38,7 +38,7 @@ fn test2<A: Debug>(a: A) -> Result<A, Trace<ErrorY>> {
 }
 
 fn test3<A: Debug>(a: A) -> Result<A, Trace<ErrorZ>> {
-    let result = try!(Trace::map(test2(a)));
+    let result = try!(Trace::trace(test2(a)));
     println!("Got result {:?}", result);
     Ok(result)
 }
