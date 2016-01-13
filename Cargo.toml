@@ -1,6 +1,6 @@
 [package]
 name = "stacktrace"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Edward Pierzchalski <e.a.pierzchalski@gmail.com>"]
 exclude = [".gitignore"]
 readme = "README.md"
@@ -17,16 +17,9 @@ backtrace = "0.1.8"
 libc = "0.2.4"
 
 [[example]]
-name = "ex1"
-path = "examples/ex1/main.rs"
-# Include debugging symbols even in release build
-# so that the test still produces useful output
-# unfortunately, this also keeps debug asserts
-[profile.release]
-debug = true
+name = "simple"
+path = "examples/simple/main.rs"
 
 [[example]]
-name = "ex2"
-path = "examples/ex2/main.rs"
-#[profile.release]
-# debug = true
+name = "using_result"
+path = "examples/using_result/main.rs"
