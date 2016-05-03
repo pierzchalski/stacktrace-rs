@@ -24,6 +24,8 @@
 //! ```
 //!
 //! # Example use
+//! See also these [examples](https://github.com/pierzchalski/stacktrace-rs/tree/master/examples).
+//!
 //! ```
 //! #[macro_use] extern crate stacktrace;
 //!
