@@ -1,8 +1,6 @@
-#[macro_use]
-extern crate stacktrace;
+#[macro_use] extern crate stacktrace;
 
 use std::fmt::Debug;
-use stacktrace::Trace;
 
 #[derive(Debug)]
 struct ErrorX(String);
@@ -23,27 +21,33 @@ impl From<ErrorY> for ErrorZ {
     }
 }
 
-fn test1<A: Debug>(a: A) -> Result<A, ErrorX> {
-    let message = format!("An error: {:?}", a);
-    if message.len() > "An error: ______".len() {
-        return Err(ErrorX(message));
-    }
-    Ok(a)
+trace! {
+    ErrorX => ErrorY,
+    ErrorY => ErrorZ,
 }
 
-fn test2<A: Debug>(a: A) -> Result<A, Trace<ErrorY>> {
-    let result = try!(Trace::result(test1(a)));
-    println!("Got result {:?}", result);
+fn test1(n: usize) -> Result<String, ErrorX> {
+    if n >= 10 {
+        return Err(ErrorX(format!("{} is too big!", n)))
+    }
+    Ok(format!("{} is small enough.", n))
+}
+
+fn test2(n: usize) -> Result<String, Trace<ErrorY>> {
+    // uses the generated "From<ErrorX> for Trace<ErrorY>"
+    let result = try!(test1(n));
+    println!("Test 2 got result {:?}", result);
     Ok(result)
 }
 
-fn test3<A: Debug>(a: A) -> Result<A, Trace<ErrorZ>> {
-    let result = try!(Trace::trace(test2(a)));
-    println!("Got result {:?}", result);
+fn test3(n: usize) -> Result<String, Trace<ErrorZ>> {
+    // uses the generated "From<Trace<ErrorY>> for Trace<ErrorZ>"
+    let result = try!(test2(n));
+    println!("Test 3 got result {:?}", result);
     Ok(result)
 }
 
 fn main() {
-    println!("Success:\n{:?}\n", test3("yolo"));
-    println!("Failure:\n{:?}\n", test3("swagger"));
+    println!("Success:\n{:?}\n", test3(1));
+    println!("Failure:\n{:?}\n", test3(10));
 }

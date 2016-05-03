@@ -1,10 +1,10 @@
-extern crate stacktrace;
+#[macro_use] extern crate stacktrace;
 
-use stacktrace::StackInfo;
+trace!();
 
-fn layer1() -> StackInfo { StackInfo::new() }
-fn layer2() -> StackInfo { layer1() }
-fn layer3() -> StackInfo { layer2() }
+fn layer1() -> Trace<String> { Trace::new("a message".into()) }
+fn layer2() -> Trace<String> { layer1() }
+fn layer3() -> Trace<String> { layer2() }
 
 fn main() {
     println!("{:?}", layer3());
